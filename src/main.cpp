@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <iterator>
 #include <string>
@@ -59,9 +60,11 @@ std::vector<Token> tokenize(const std::string& content)
 int main (int argc, char *argv[])
 {
 	// assert(argc == 3);
+
+	std::string outpath = argc > 1 ? argv[2] : "C:/Projects/boglang/code/hello.asm";
 	
 	std::ifstream in(argc > 1 ? argv[1] : "C:/Projects/boglang/code/hello.glp");
-	std::ofstream out(argc > 1 ? argv[2] : "C:/Projects/boglang/code/hello.asm");
+	std::ofstream out(outpath);
 	assert(in);
 	assert(out);
 
@@ -80,6 +83,10 @@ int main (int argc, char *argv[])
 		switch (token.type)
 		{
 			case ret:
+				if (i + 1 >= tokens.size()) {
+					std::cerr << "ERROR!!!! No return value specified!" << std::endl;
+					return EXIT_FAILURE;
+				}
 				buffer = "mov eax, " + tokens[i+1].val +
 						"\nret\n";
 				i++;
@@ -98,7 +105,15 @@ int main (int argc, char *argv[])
 
 	in.close();
 	out.close();
+	std::string bpath = outpath.substr(0, outpath.length() - 4);
+	std::string ascmd = "C:\\msys64\\mingw32\\bin\\nasm.exe -f win32 ";
+	std::string opath = bpath + ".o";
+	ascmd += outpath + " -o " + opath;
+	std::system(ascmd.c_str());
 
+	std::string ldcmd = "C:\\msys64\\mingw32\\bin\\ld.exe "
+	+ opath + " -o " + bpath + ".exe";
+	std::system(ldcmd.c_str());
 
 	return EXIT_SUCCESS;
 }
