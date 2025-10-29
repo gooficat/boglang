@@ -1,79 +1,13 @@
 # boglang
+### its a compiled programming language
+| what does it do?
 
-A CPP project created with the VSCode CPP Project Generator extension.
+> frighteningly little
 
-## Prerequisites
+| what does it need?
 
-- CMake 3.15 or higher
-- GCC/Clang C++ compiler
-- vcpkg (optional, for package management)
+> msys64 with mingw32's version of nasm, and ld.
+> msys64 MUST be in the C: directory
 
-## Building
-
-### Using VSCode
-
-1. Open the project folder in VSCode
-2. Install the recommended extensions (C/C++, CMake Tools)
-3. Press `Ctrl+Shift+P` and run "CMake: Configure"
-4. Press `F7` or use "CMake: Build" to build the project
-
-### Command Line
-
-```bash
-# Create build directory
-mkdir build && cd build
-
-# Configure
-cmake ..
-
-# Build
-cmake --build .
-
-# Run
-./boglang
-```
-
-## Project Structure
-
-```
-boglang/
-├── .vscode/              # VSCode configuration
-├── src/                  # Source files
-├── include/              # Header files
-├── build/               # Build output (generated)
-├── CMakeLists.txt       # CMake configuration
-├── vcpkg.json          # vcpkg dependencies
-├── .clang-format       # Code formatting rules
-├── .editorconfig       # Editor configuration
-├── .gitignore          # Git ignore rules
-├── .gitattributes      # Git attributes
-└── README.md           # This file
-```
-
-## Features
-
-- Modern CPP standards (C++20)
-- CMake build system
-- vcpkg integration for package management
-- Clang-format for code formatting
-- VSCode debugging configuration
-- Cross-platform support (Windows, Linux, macOS)
-
-## Adding Dependencies
-
-Edit `vcpkg.json` to add dependencies:
-
-```json
-{
-  "dependencies": [
-    "fmt",
-    "spdlog"
-  ]
-}
-```
-
-Then reconfigure CMake to install the dependencies.
-
-## Debugging
-
-Press `F5` in VSCode to start debugging, or use the "Debug" configuration in the Run and Debug panel.
+### features so far:
+- return a value
