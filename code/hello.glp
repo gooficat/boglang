@@ -1,1 +1,2 @@
-ret 41
+fun _start
+	ret 0

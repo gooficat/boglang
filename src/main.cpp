@@ -6,56 +6,22 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <cassert>
 #include <stdint.h>
+#include <algorithm>
+
 
 enum TokenType {
+	lit,
+	fun,
 	ret,
-	lit_int,
-	newl
 };
 
 struct Token {
 	TokenType type;
-	std::string val;
-	Token(const TokenType& type, const std::string& val) : type(type), val(val) {}
+	std::string value;
 };
-
-std::vector<Token> tokenize(const std::string& content)
-{
-	std::vector<Token> tokens;
-
-	std::string buffer = "";
-	for (int i = 0; i < content.length(); i++)
-	{
-		char c = content.at(i);
-		if (isalnum(c))
-		{
-			buffer.push_back(c);
-			++i;
-			while(i != content.length() && isalnum(content.at(i)))
-			{
-				buffer = buffer + content.at(i);
-				++i;
-			}
-			TokenType type;
-			if (atoi(buffer.c_str())) {
-				type = lit_int;
-			}
-			else {
-				type = ret;
-			}
-			tokens.push_back(
-				Token(type, buffer)
-			);
-		}
-		else {
-			std::cout << "Not a literal" << std::endl;
-		}
-		buffer = "";
-	}
-	return tokens;
-}
 
 int main (int argc, char *argv[])
 {
@@ -75,36 +41,64 @@ int main (int argc, char *argv[])
 
 	out.flush();
 	
-	std::vector<Token> tokens = tokenize(content);
 
-	std::string buffer = "";
-	for (int i = 0; i != tokens.size(); i++) {
-		Token& token = tokens[i];
-		switch (token.type)
-		{
-			case ret:
-				if (i + 1 >= tokens.size()) {
-					std::cerr << "ERROR!!!! No return value specified!" << std::endl;
-					return EXIT_FAILURE;
-				}
-				buffer = "mov eax, " + tokens[i+1].val +
-						"\nret\n";
-				i++;
-				break;
-			case newl:
-				break;
+	std::replace(content.begin(), content.end(), '\n', ' ');
+	std::replace(content.begin(), content.end(), '\t', ' ');
 
-			default:
-				break;
-		}
+	std::stringstream strm(content);
 
-		out << buffer;
-		buffer = "";
+	std::vector<std::string> words;
+	
+	std::string interm;
+	while (getline(strm, interm, ' ')) {
+		words.emplace_back(interm);
 	}
 
 
 	in.close();
+
+	std::vector<Token> tokens;
+
+	std::string buf = "";
+	for (int i = 0; i != words.size(); i++) {
+		auto& word = words[i];
+		if (word == "" || word == "") continue;
+		std::cout << word;
+		std::string kw = word.substr(0, 3);
+		if( kw == "fun") {
+			// std::cout << word << " " << words[i+1] << std::endl;
+			tokens.emplace_back(TokenType::fun, words[i+1]);
+		}
+		else if (kw == "ret") {
+			// std::cout << word << " " << words[i+1] << std::endl;
+			tokens.emplace_back(TokenType::ret, words[i+1]);
+		}
+	}
+	std::cout << std::endl;
+
+	
+	std::string ASM = "\
+global _start\n";
+
+	for (auto& tok : tokens) {
+		switch (tok.type) {
+		case fun:
+			ASM += tok.value + ":\n";
+			break;
+		case ret:
+			ASM += "mov eax, " + tok.value + "\n";
+			ASM += "ret\n";
+			break;
+		default:
+			break;
+		}
+	}
+
+	out << ASM << std::endl;
+	
 	out.close();
+
+	// this assembles and links the resulting .asm file
 	std::string bpath = outpath.substr(0, outpath.length() - 4);
 	std::string ascmd = "C:\\msys64\\mingw32\\bin\\nasm.exe -f win32 ";
 	std::string opath = bpath + ".o";
