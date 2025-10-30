@@ -119,7 +119,8 @@ int main (int argc, char *argv[])
 	}
 	
 	std::string ASM = "\
-global _start\n";
+section .text\n\
+global start\n";
 
 	for (int i = 0; i != tokens.size(); i++) {
 		Token& tok = tokens[i];
@@ -147,7 +148,7 @@ global _start\n";
 	ascmd += outpath + " -o " + opath;
 	std::system(ascmd.c_str());
 
-	std::string ldcmd = "C:\\msys64\\mingw32\\bin\\ld.exe "
+	std::string ldcmd = "C:\\msys64\\mingw32\\bin\\ld.exe -e start "
 	+ opath + " -o " + bpath + ".exe";
 	std::system(ldcmd.c_str());
 
